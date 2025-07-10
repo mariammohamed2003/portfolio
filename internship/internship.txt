@@ -564,7 +564,7 @@
         const typewriterElement = document.getElementById('typewriter');
         const cursorElement = document.getElementById('typewriter-cursor');
         // Updated typewriter text for internship portfolio
-        const textToType = "Gaining Real-World Experience in IT &amp; Data.";
+        const textToType = "Gaining Real-World Experience in IT & Data.";
         let i = 0;
         function typeWriter() {
             if (i < textToType.length) {
