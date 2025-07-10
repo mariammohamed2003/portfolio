@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Internship Portfolio: IT & Database Experiences</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        :root {
+            --bg-color: #FFF5F7;
+            --text-primary: #4A2731;
+            --accent-pink: #E6A4B4;
+            --accent-pink-dark: #C88EA7;
+            --scroll-bar-color: var(--accent-pink);
+            --scroll-bar-bg: #FADADD;
+        }
+
+        /* --- Global & Accessibility --- */
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            position: relative; /* Added for background shapes */
+        }
+        .font-heading { font-family: 'Playfair Display', serif; }
+
+        /* --- Animations & Transitions --- */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(40px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes glow {
+            0%, 100% { text-shadow: 0 0 2px var(--accent-pink), 0 0 5px var(--accent-pink); } /* Reduced glow */
+            50% { text-shadow: 0 0 10px var(--accent-pink-dark), 0 0 15px var(--accent-pink-dark); } /* Reduced glow */
+        }
+        @keyframes grow { from { width: 0%; } to { width: 100%; } }
+        @keyframes float {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(20px, 30px); }
+        }
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.05); opacity: 0.8; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .animated-item {
+            opacity: 0;
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+            transform: translateY(30px);
+            will-change: transform, opacity;
+        }
+        .animated-item.is-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        @media (prefers-reduced-motion: reduce) {
+            .animated-item, * {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+                scroll-behavior: auto !important;
+            }
+        }
+
+        /* --- Preloader --- */
+        #preloader {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: var(--bg-color); z-index: 1000;
+            display: flex; justify-content: center; align-items: center;
+            transition: opacity 0.7s ease, visibility 0.7s ease;
+        }
+        #preloader.fade-out { opacity: 0; visibility: hidden; }
+        .loader-text { font-family: 'Playfair Display', serif; font-size: 2rem; color: var(--accent-pink); }
+
+        /* --- Header & Navigation --- */
+        .header {
+            background-color: rgba(255, 245, 247, 0.8);
+            backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+            position: sticky; top: 0; z-index: 50;
+            border-bottom: 1px solid var(--scroll-bar-bg);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+        }
+        #scroll-progress {
+            position: fixed; top: 0; left: 0; height: 3px;
+            background: var(--scroll-bar-color); width: 0%; z-index: 100;
+            transition: width 0.1s linear;
+        }
+        .nav-link { transition: transform 0.3s ease, color 0.3s ease; }
+        .nav-link:hover { transform: translateY(-2px); color: var(--accent-pink); }
+        .active-nav {
+            color: var(--accent-pink); font-weight: 600;
+            position: relative; text-shadow: 0 0 8px rgba(230, 164, 180, 0.7);
+        }
+        .active-nav::after {
+            content: ''; position: absolute; bottom: -6px; left: 0; width: 100%; height: 2px;
+            background-color: var(--accent-pink); animation: grow 0.4s ease-out;
+        }
+        
+        /* --- Cards & Sections --- */
+        .project-card, .skill-card {
+            background-color: #FFFFFF; border-radius: 1.5rem; border: 1px solid var(--scroll-bar-bg);
+            box-shadow: 0 10px 20px -5px rgba(230, 164, 180, 0.1);
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.4s ease;
+        }
+        .project-card:hover {
+            transform: translateY(-10px) rotate(1deg);
+            box-shadow: 0 20px 30px -10px rgba(230, 164, 180, 0.2);
+        }
+        
+        /* --- Text & Buttons --- */
+        .text-gradient {
+            background-image: linear-gradient(135deg, var(--accent-pink-dark), var(--accent-pink));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+        .glowing-text { animation: glow 4s ease-in-out infinite; }
+        
+        .btn-primary {
+            display: inline-block;
+            background-color: var(--accent-pink);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px -3px rgba(230, 164, 180, 0.5);
+        }
+        .btn-primary:hover {
+            background-color: var(--accent-pink-dark);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px -3px rgba(200, 142, 167, 0.6);
+        }
+        
+        /* --- Hero Section & Typewriter --- */
+        #typewriter-cursor { animation: glow 1.5s ease-in-out infinite; }
+        .hero-paragraph { opacity: 0; transform: translateY(20px); transition: opacity 0.5s 2.8s, transform 0.5s 2.8s; }
+
+        /* --- Expandable Content (Accordion) --- */
+        .expand-button {
+            width: 100%;
+            padding: 1.5rem;
+            border-radius: 1.25rem;
+            background-color: white;
+            border: 1px solid var(--scroll-bar-bg);
+            box-shadow: 0 5px 15px -3px rgba(230, 164, 180, 0.08);
+            transition: all 0.3s ease;
+        }
+        .expand-button:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px -5px rgba(230, 164, 180, 0.2);
+            border-color: var(--accent-pink);
+        }
+        .expandable-content {
+            padding: 0 1.5rem;
+            max-height: 0;
+            overflow: hidden;
+            background-color: white;
+            border-radius: 0 0 1.25rem 1.25rem;
+            border: 1px solid var(--scroll-bar-bg);
+            border-top: none;
+            box-shadow: 0 10px 15px -5px rgba(230, 164, 180, 0.1) inset;
+            will-change: max-height;
+            transition: max-height 1s cubic-bezier(0.4, 0, 0.2, 1), padding 0.5s ease;
+        }
+        .expandable-content.expanded {
+            max-height: 2500px; /* Generous height for all content */
+            padding-top: 1rem;
+            padding-bottom: 2rem;
+        }
+        .chevron { transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .expanded .chevron { transform: rotate(180deg); }
+
+        /* --- Background Shapes --- */
+        .background-shape {
+            position: absolute;
+            background-color: var(--accent-pink); /* Use accent color */
+            opacity: 0.08; /* Very subtle */
+            border-radius: 50%; /* Make them circles */
+            filter: blur(50px); /* Soft blur effect */
+            z-index: -1; /* Send them to the back */
+            will-change: transform; /* For smooth animations if added later */
+        }
+
+        .shape-1 {
+            width: 200px;
+            height: 200px;
+            top: 5%;
+            left: -10%;
+            background-color: var(--accent-pink-dark);
+            animation: float 10s ease-in-out infinite alternate;
+        }
+
+        .shape-2 {
+            width: 150px;
+            height: 150px;
+            top: 30%;
+            right: -5%;
+            background-color: var(--accent-pink);
+            animation: float 12s ease-in-out infinite alternate-reverse;
+        }
+
+        .shape-3 {
+            width: 100px;
+            height: 100px;
+            bottom: 15%;
+            left: 10%;
+            background-color: var(--scroll-bar-bg);
+            animation: float 8s ease-in-out infinite alternate;
+        }
+
+        .shape-4 {
+            width: 250px;
+            height: 250px;
+            bottom: 5%;
+            right: -15%;
+            background-color: var(--accent-pink-dark);
+            opacity: 0.05;
+            animation: float 14s ease-in-out infinite alternate-reverse;
+        }
+
+        .shape-5 {
+            width: 180px;
+            height: 180px;
+            top: 60%;
+            left: -8%;
+            background-color: var(--accent-pink);
+            animation: float 11s ease-in-out infinite alternate;
+        }
+
+        /* For smaller screens, adjust shape sizes and positions */
+        @media (max-width: 768px) {
+            .background-shape {
+                opacity: 0.05; /* Even more subtle on mobile */
+                filter: blur(30px);
+            }
+            .shape-1 { width: 100px; height: 100px; top: 10%; left: -15%; }
+            .shape-2 { width: 80px; height: 80px; top: 40%; right: -10%; }
+            .shape-3 { width: 70px; height: 70px; bottom: 20%; left: -5%; }
+            .shape-4 { width: 120px; height: 120px; bottom: 10%; right: -10%; }
+            .shape-5 { width: 90px; height: 90px; top: 70%; left: -10%; }
+        }
+
+        /* Carousel specific styles */
+        .carousel-container {
+            position: relative;
+            width: 100%;
+            overflow: hidden;
+            border-radius: 0 0 1.5rem 1.5rem; /* Matches project card border-radius */
+        }
+
+        .carousel-track {
+            display: flex;
+            transition: transform 0.5s ease-in-out;
+        }
+
+        .carousel-img {
+            width: 100%;
+            flex-shrink: 0; /* Ensures images don't shrink */
+            display: block; /* Removes extra space below image */
+            object-fit: cover; /* Ensures image covers the area */
+        }
+
+        .carousel-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background-color: rgba(255, 255, 255, 0.6);
+            border-radius: 50%;
+            padding: 0.5rem;
+            cursor: pointer;
+            z-index: 10;
+            transition: background-color 0.3s ease;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .carousel-btn:hover {
+            background-color: rgba(255, 255, 255, 0.9);
+        }
+
+        .carousel-btn.prev-btn {
+            left: 1rem;
+        }
+
+        .carousel-btn.next-btn {
+            right: 1rem;
+        }
+
+        .carousel-dots {
+            position: absolute;
+            bottom: 1rem;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 0.5rem;
+            z-index: 10;
+        }
+
+        .dot {
+            width: 0.75rem;
+            height: 0.75rem;
+            background-color: rgba(255, 255, 255, 0.7);
+            border-radius: 50%;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+        }
+
+        .dot.active {
+            background-color: var(--accent-pink);
+            transform: scale(1.2);
+        }
+        
+    </style>
+</head>
+<body class="antialiased">
+    
+    <div id="preloader"><span class="loader-text glowing-text">INTERNSHIPS</span></div>
+    <div id="scroll-progress"></div>
+
+    <header class="header">
+        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <!-- Updated href to point to the specified external domain and text changed to "Home Page" -->
+            <a href="https://roma-gilt.vercel.app" class="text-2xl font-heading font-bold text-primary hover:text-[var(--accent-pink)] transition duration-300">Home Page</a>
+            <div class="hidden md:flex space-x-8 text-primary font-medium">
+                <a href="#introduction" class="nav-link nav-item">Introduction</a>
+                <a href="#internships" class="nav-link nav-item">Internships</a>
+                <a href="#skills-gained" class="nav-link nav-item">Skills</a>
+                <a href="#contact" class="nav-link nav-item">Contact</a>
+            </div>
+            <a href="https://www.linkedin.com/in/mariam-mohamed-kamal25/" target="_blank" class="btn-primary hidden md:inline-block">LinkedIn</a>
+        </nav>
+    </header>
+
+    <main class="container mx-auto px-6 py-12 md:py-20">
+
+        <section id="introduction" class="text-center mb-24 md:mb-32 pt-10">
+            <div class="max-w-4xl mx-auto skill-card p-6 md:p-10">
+                <!-- Updated image source to "images/roma.jpg" -->
+                <img src="images/roma.jpg" alt="Mariam Mohamed Kamal Profile Picture" class="w-96 h-96 rounded-full mx-auto mb-6 border-4 border-white shadow-lg transition-transform duration-500 hover:scale-110 animated-item">
+                <h1 class="text-5xl md:text-7xl font-heading font-extrabold leading-tight mt-4 text-gradient glowing-text" id="hero-title">
+                    <span id="typewriter"></span><span id="typewriter-cursor">|</span>
+                </h1>
+                <p class="mt-8 text-lg text-primary/80 leading-relaxed max-w-3xl mx-auto hero-paragraph">
+                    This portfolio highlights my practical experiences through various internships, focusing on real-world application of IT, database management, &amp; business intelligence concepts. These opportunities have significantly broadened my technical skill set &amp; provided invaluable insights into enterprise-level systems &amp; operations.
+                </p>
+                <div class="mt-10"><a href="#internships" class="btn-primary text-lg">Explore My Internships</a></div>
+            </div>
+        </section>
+
+        <section id="internships" class="mb-20 md:mb-28 scroll-mt-24 animated-item">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl md:text-5xl font-heading font-bold text-primary">
+                    My Internship Experiences <i class="fas fa-cogs text-accent-pink-dark ml-4 animate-spin" style="animation-duration: 4s;"></i>
+                </h2>
+                <p class="mt-5 text-lg text-primary/70 max-w-3xl mx-auto">Hands-on learning &amp; practical application in diverse IT environments.</p>
+            </div>
+            <div class="space-y-8 max-w-5xl mx-auto">
+                <!-- MegaSoft IT Training Internship -->
+                <div class="project-card animated-item">
+                    <div class="p-6">
+                        <h3 class="text-2xl font-heading font-semibold text-primary mb-3">
+                            <span class="text-4xl mr-2 text-blue-500 animate-pulse" style="animation-duration: 2s;">🏢</span> MegaSoft IT Training – 2-Month Internship
+                        </h3>
+                        <p class="text-primary/70 mb-4">As part of a two-month internship at MegaSoft, I joined a structured training program divided into two key tracks. The first month focused on IT Service Management using IBM technologies, while the second month introduced me to Business Intelligence tools &amp; reporting.</p>
+                        
+                        <h4 class="text-xl font-heading font-semibold text-primary mb-2 mt-4">
+                            <span class="text-2xl mr-2 text-blue-400">🟦</span> Month 1 – ITSM Track (IBM Maximo &amp; ITIL):
+                        </h4>
+                        <p class="text-primary/70 mb-4">During this phase, we worked with IBM Maximo under the Enterprise Asset Management (EAM) framework. I learned how service requests &amp; asset tracking operate within an enterprise system. My practical tasks included:</p>
+                        <ul class="list-disc list-inside text-primary/70 space-y-1 mb-4 pl-2 text-sm">
+                            <li>Creating &amp; customizing Start Centers in Maximo</li>
+                            <li>Designing basic Workflows to simulate real-life service processes</li>
+                            <li>Gaining a functional understanding of EAM &amp; how it connects to ITIL practices</li>
+                            <li>Working in teams to present use cases &amp; apply knowledge through practical assignments</li>
+                        </ul>
+
+                        <h4 class="text-xl font-heading font-semibold text-primary mb-2 mt-4">
+                            <span class="text-2xl mr-2 text-blue-400">🟦</span> Month 2 – BI Track (DB2, SQL &amp; Cognos):
+                        </h4>
+                        <p class="text-primary/70 mb-4">In the second month, the focus shifted to data analysis &amp; reporting. I worked with:</p>
+                        <ul class="list-disc list-inside text-primary/70 space-y-1 mb-4 pl-2 text-sm">
+                            <li>IBM DB2 to understand relational databases &amp; perform SQL queries</li>
+                            <li>IBM Cognos Analytics to design reports &amp; extract insights from ticketing data</li>
+                            <li>Building simple reports &amp; queries related to service request performance &amp; issue trends</li>
+                        </ul>
+                        <p class="text-primary/70">This internship gave me valuable hands-on experience with enterprise-level IBM tools. It allowed me to understand both the operational &amp; analytical sides of IT systems, &amp; enhanced my technical skills in service workflows, database queries, &amp; reporting dashboards.</p>
+                    </div>
+                    <!-- Image Carousel for MegaSoft -->
+                    <div class="carousel-container" data-autoplay-interval="5000">
+                        <div class="carousel-track">
+                            <img src="images/m1.jpg" alt="MegaSoft Internship Image 1" class="carousel-img">
+                            <img src="images/m2.jpg" alt="MegaSoft Internship Image 2" class="carousel-img">
+                            <img src="images/m3.jpg" alt="MegaSoft Internship Image 3" class="carousel-img">
+                            <img src="images/m4.jpg" alt="MegaSoft Internship Image 4" class="carousel-img">
+                            <img src="images/m5.jpeg" alt="MegaSoft Internship Image 5" class="carousel-img">
+                            <img src="images/m6.jpeg" alt="MegaSoft Internship Image 6" class="carousel-img">
+                        </div>
+                        <button class="carousel-btn prev-btn">
+                            <i class="fas fa-chevron-left text-primary"></i>
+                        </button>
+                        <button class="carousel-btn next-btn">
+                            <i class="fas fa-chevron-right text-primary"></i>
+                        </button>
+                        <div class="carousel-dots"></div>
+                    </div>
+                </div>
+
+                <!-- Oracle Database Administration – Global Academy -->
+                <div class="project-card animated-item">
+                    <div class="p-6">
+                        <h3 class="text-2xl font-heading font-semibold text-primary mb-3">
+                            <span class="text-4xl mr-2 text-green-500 animate-pulse" style="animation-duration: 2s; animation-delay: 0.5s;">📚</span> Oracle Database Administration – Global Academy
+                        </h3>
+                        <p class="text-primary/70 mb-4">I began my journey with Oracle Database Administration through a practical course at Global Academy, where I learned the core responsibilities of a DBA using Oracle 19c. The course started with hands-on training in SQL using Oracle SQL Developer, where I practiced essential commands needed for any database administrator.</p>
+                        
+                        <h4 class="text-xl font-heading font-semibold text-primary mb-2 mt-4">Course Highlights:</h4>
+                        <p class="text-primary/70 mb-4">We then moved to the administration part on Linux, where I learned:</p>
+                        <ul class="list-disc list-inside text-primary/70 space-y-1 mb-4 pl-2 text-sm">
+                            <li>How to manage users &amp; roles</li>
+                            <li>How to start &amp; shut down a database instance</li>
+                            <li>The architecture of Oracle Database, &amp; how components interact internally</li>
+                            <li>How to control user privileges &amp; system access</li>
+                        </ul>
+                        <p class="text-primary/70">Later, we focused on backup &amp; recovery using RMAN (Recovery Manager), &amp; I practiced different types of backups, including full &amp; incremental backups.</p>
+                    </div>
+                    <!-- Image Carousel for Global Academy -->
+                    <div class="carousel-container" data-autoplay-interval="5000">
+                        <div class="carousel-track">
+                            <img src="images/j1.png" alt="Global Academy DBA Image 1" class="carousel-img">
+                            <img src="images/j2.jpeg" alt="Global Academy DBA Image 2" class="carousel-img">
+                            <img src="images/j3.jpeg" alt="Global Academy DBA Image 3" class="carousel-img">
+                        </div>
+                        <button class="carousel-btn prev-btn">
+                            <i class="fas fa-chevron-left text-primary"></i>
+                        </button>
+                        <button class="carousel-btn next-btn">
+                            <i class="fas fa-chevron-right text-primary"></i>
+                        </button>
+                        <div class="carousel-dots"></div>
+                    </div>
+                </div>
+
+                <!-- Raly IT Internship -->
+                <div class="project-card animated-item">
+                    <div class="p-6">
+                        <h3 class="text-2xl font-heading font-semibold text-primary mb-3">
+                            <span class="text-4xl mr-2 text-purple-500 animate-pulse" style="animation-duration: 2s; animation-delay: 1s;">💻</span> Raly IT Internship
+                        </h3>
+                        <p class="text-primary/70 mb-4">Following my Oracle DBA course, I joined a two-month internship at Raly IT, where I applied my DBA knowledge in a more practical, task-based environment. During this internship, I worked on:</p>
+                        <ul class="list-disc list-inside text-primary/70 space-y-1 mb-4 pl-2 text-sm">
+                            <li>Installing Oracle Linux 7 &amp; preparing the environment</li>
+                            <li>Installing &amp; creating Oracle Database instances</li>
+                            <li>Performing patch management tasks using OPatch</li>
+                            <li>Practicing day-to-day DBA tasks suchs as monitoring, user creation, &amp; system configuration</li>
+                        </ul>
+                        <p class="text-primary/70">This internship provided crucial hands-on experience, solidifying my foundational knowledge in Oracle DBA with real-world operational tasks.</p>
+                    </div>
+                    <!-- Image Carousel for Raly IT -->
+                    <div class="carousel-container" data-autoplay-interval="5000">
+                        <div class="carousel-track">
+                            <img src="images/r1.jpeg" alt="Raly IT Internship Image 1" class="carousel-img">
+                            <img src="images/r2.jpeg" alt="Raly IT Internship Image 2" class="carousel-img">
+                            <img src="images/r3.jpeg" alt="Raly IT Internship Image 3" class="carousel-img">
+                            <img src="images/r4.jpeg" alt="Raly IT Internship Image 4" class="carousel-img">
+                        </div>
+                        <button class="carousel-btn prev-btn">
+                            <i class="fas fa-chevron-left text-primary"></i>
+                        </button>
+                        <button class="carousel-btn next-btn">
+                            <i class="fas fa-chevron-right text-primary"></i>
+                        </button>
+                        <div class="carousel-dots"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="skills-gained" class="mb-20 md:mb-28 scroll-mt-24">
+            <div class="text-center animated-item mb-16">
+                <h2 class="text-4xl md:text-5xl font-heading font-bold text-primary">Key Skills Gained from Internships</h2>
+                <p class="mt-5 text-lg text-primary/70 max-w-3xl mx-auto">A summary of the technical &amp; operational skills honed during my internship experiences.</p>
+            </div>
+            <div class="skill-card p-6 md:p-10 max-w-5xl mx-auto mb-8">
+                <ul class="list-disc list-inside text-primary/70 space-y-2 pl-2">
+                    <li><strong>IT Service Management (ITSM):</strong> Functional understanding of IBM Maximo, EAM, &amp; ITIL practices; experience in service request workflows & asset tracking.</li>
+                    <li><strong>Business Intelligence (BI):</strong> Proficiency with IBM DB2 for relational databases &amp; SQL querying; experience in designing reports &amp; extracting insights using IBM Cognos Analytics.</li>
+                    <li><strong>Oracle Database Administration (DBA):</strong> Core responsibilities of a DBA with Oracle 19c; hands-on SQL practice with Oracle SQL Developer.</li>
+                    <li><strong>Linux System Administration:</strong> Managing users &amp; roles, starting/shutting down database instances, controlling user privileges, installing Oracle Linux.</li>
+                    <li><strong>Database Architecture &amp; Management:</strong> Understanding of Oracle Database internal components; practical experience in monitoring, user creation, &amp; system configuration.</li>
+                    <li><strong>Backup &amp; Recovery:</strong> Proficient in using RMAN for various backup types (full, incremental).</li>
+                    <li><strong>Patch Management:</strong> Experience with OPatch for applying database patches.</li>
+                    <li><strong>Team Collaboration &amp; Presentation:</strong> Experience working in teams, presenting use cases, &amp; applying theoretical knowledge to practical assignments.</li>
+                </ul>
+            </div>
+        </section>
+
+        <section id="contact" class="scroll-mt-24 animated-item">
+             <div class="text-center">
+                <h2 class="text-4xl md:text-5xl font-heading font-bold text-primary">Get In Touch</h2>
+                <p class="mt-5 text-lg text-primary/70 max-w-2xl mx-auto">I'm always open to discussing new projects, creative ideas, or opportunities. Feel free to reach out.</p>
+                <div class="mt-8">
+                     <a href="mailto:mariam.kamal.sof@gmail.com" class="btn-primary text-lg">mariam.kamal.sof@gmail.com</a>
+                     <p class="text-primary/60 mt-4">Phone: +20 109 902 4089</p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-primary/5 border-t border-pink-100 mt-20">
+        <div class="container mx-auto px-6 py-8 text-center text-primary/70">
+            <p>© 2024 My Internship Portfolio. Designed with creativity &amp; passion.</p>
+        </div>
+    </footer>
+
+    <!-- Background Shapes -->
+    <div class="background-shape shape-1"></div>
+    <div class="background-shape shape-2"></div>
+    <div class="background-shape shape-3"></div>
+    <div class="background-shape shape-4"></div>
+    <div class="background-shape shape-5"></div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const preloader = document.getElementById('preloader');
+        window.addEventListener('load', () => { preloader.classList.add('fade-out'); });
+
+        const scrollProgress = document.getElementById('scroll-progress');
+        window.addEventListener('scroll', () => {
+            const scrollPx = document.documentElement.scrollTop;
+            const winHeightPx = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            scrollProgress.style.width = `${(scrollPx / winHeightPx) * 100}%`;
+        });
+
+        const animatedItems = document.querySelectorAll('.animated-item');
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach((entry) => {
+                if (entry.isIntersecting) {
+                    setTimeout(() => { entry.target.classList.add('is-visible'); }, 100);
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.1 });
+        animatedItems.forEach(item => observer.observe(item));
+
+        const sections = document.querySelectorAll('main section');
+        const navLinks = document.querySelectorAll('.nav-item');
+        const navObserver = new IntersectionObserver(entries => {
+            entries.forEach(entry => {
+                if(entry.isIntersecting) {
+                    const id = entry.target.id;
+                    navLinks.forEach(link => {
+                        link.classList.toggle('active-nav', link.getAttribute('href').substring(1) === id);
+                    });
+                }
+            });
+        }, { rootMargin: '-40% 0px -60% 0px' });
+        sections.forEach(section => navObserver.observe(section));
+
+        const typewriterElement = document.getElementById('typewriter');
+        const cursorElement = document.getElementById('typewriter-cursor');
+        // Updated typewriter text for internship portfolio
+        const textToType = "Gaining Real-World Experience in IT &amp; Data.";
+        let i = 0;
+        function typeWriter() {
+            if (i < textToType.length) {
+                if (textToType.substring(i, i+1) === ',') {
+                     typewriterElement.innerHTML += ',<br class="hidden md:inline">';
+                } else { typewriterElement.innerHTML += textToType.charAt(i); }
+                i++;
+                setTimeout(typeWriter, 60);
+            } else {
+                cursorElement.style.animation = 'none';
+                cursorElement.style.opacity = 0;
+                document.querySelector('.hero-paragraph').style.opacity = '1';
+                document.querySelector('.hero-paragraph').style.transform = 'translateY(0)';
+            }
+        }
+        setTimeout(typeWriter, 500);
+
+        // Carousel Logic
+        document.querySelectorAll('.carousel-container').forEach(container => {
+            const carouselTrack = container.querySelector('.carousel-track');
+            const images = container.querySelectorAll('.carousel-img');
+            const prevBtn = container.querySelector('.prev-btn');
+            const nextBtn = container.querySelector('.next-btn');
+            const dotsContainer = container.querySelector('.carousel-dots');
+            const dots = [];
+
+            let currentIndex = 0;
+            let autoplayInterval;
+            const autoplayDelay = parseInt(container.dataset.autoplayInterval) || 5000; // Get delay from data attribute, default to 5000ms
+
+            // Clear existing dots and images
+            dotsContainer.innerHTML = '';
+            carouselTrack.innerHTML = '';
+
+            // Define images based on carousel container ID
+            let imagePaths = [];
+            let altTexts = [];
+            if (container.closest('.project-card').querySelector('h3').textContent.includes('MegaSoft IT Training')) {
+                imagePaths = [
+                    'images/m1.jpg', 'images/m2.jpg', 'images/m3.jpg',
+                    'images/m4.jpg', 'images/m5.jpeg', 'images/m6.jpeg'
+                ];
+                altTexts = [
+                    'MegaSoft Internship Image 1', 'MegaSoft Internship Image 2', 'MegaSoft Internship Image 3',
+                    'MegaSoft Internship Image 4', 'MegaSoft Internship Image 5', 'MegaSoft Internship Image 6'
+                ];
+            } else if (container.closest('.project-card').querySelector('h3').textContent.includes('Oracle Database Administration')) {
+                imagePaths = [
+                    'images/j1.png', 'images/j2.jpeg', 'images/j3.jpeg'
+                ];
+                altTexts = [
+                    'Global Academy DBA Image 1', 'Global Academy DBA Image 2', 'Global Academy DBA Image 3'
+                ];
+            } else if (container.closest('.project-card').querySelector('h3').textContent.includes('Raly IT Internship')) {
+                imagePaths = [
+                    'images/r1.jpeg', 'images/r2.jpeg', 'images/r3.jpeg', 'images/r4.jpeg'
+                ];
+                altTexts = [
+                    'Raly IT Internship Image 1', 'Raly IT Internship Image 2', 'Raly IT Internship Image 3', 'Raly IT Internship Image 4'
+                ];
+            }
+
+            // Populate carousel with new images and create dots
+            imagePaths.forEach((path, index) => {
+                const img = document.createElement('img');
+                img.src = path;
+                img.alt = altTexts[index];
+                img.classList.add('carousel-img');
+                carouselTrack.appendChild(img);
+
+                const dot = document.createElement('span');
+                dot.classList.add('dot');
+                dot.dataset.index = index;
+                dot.addEventListener('click', () => {
+                    showImage(index);
+                    resetAutoplay();
+                });
+                dotsContainer.appendChild(dot);
+                dots.push(dot);
+            });
+
+            // Re-select images after populating
+            const updatedImages = container.querySelectorAll('.carousel-img');
+
+            function showImage(index) {
+                if (index < 0) {
+                    currentIndex = updatedImages.length - 1;
+                } else if (index >= updatedImages.length) {
+                    currentIndex = 0;
+                } else {
+                    currentIndex = index;
+                }
+
+                const offset = -currentIndex * 100;
+                carouselTrack.style.transform = `translateX(${offset}%)`;
+
+                // Update active dot
+                dots.forEach((dot, i) => {
+                    dot.classList.toggle('active', i === currentIndex);
+                });
+            }
+
+            function startAutoplay() {
+                autoplayInterval = setInterval(() => {
+                    showImage(currentIndex + 1);
+                }, autoplayDelay);
+            }
+
+            function resetAutoplay() {
+                clearInterval(autoplayInterval);
+                startAutoplay();
+            }
+
+            prevBtn.addEventListener('click', () => {
+                showImage(currentIndex - 1);
+                resetAutoplay();
+            });
+            nextBtn.addEventListener('click', () => {
+                showImage(currentIndex + 1);
+                resetAutoplay();
+            });
+
+            // Initial display and start autoplay
+            showImage(0);
+            startAutoplay();
+        });
+    });
+    </script>
+</body>
+</html>

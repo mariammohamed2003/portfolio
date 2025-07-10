@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mariam Mohamed Kamal: Portfolio Home</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        :root {
+            --bg-color: #FFF5F7;
+            --text-primary: #4A2731;
+            --accent-pink: #E6A4B4;
+            --accent-pink-dark: #C88EA7;
+            --scroll-bar-color: var(--accent-pink);
+            --scroll-bar-bg: #FADADD;
+        }
+
+        /* --- Global & Accessibility --- */
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            position: relative;  /* Added for background shapes */
+        }
+        .font-heading { font-family: 'Playfair Display', serif; }
+
+        /* --- Animations & Transitions --- */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(40px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes glow {
+            0%, 100% { text-shadow: 0 0 2px var(--accent-pink), 0 0 5px var(--accent-pink); }
+            50% { text-shadow: 0 0 10px var(--accent-pink-dark), 0 0 15px var(--accent-pink-dark); }
+        }
+        @keyframes grow { from { width: 0%; } to { width: 100%; } }
+        @keyframes float {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(20px, 30px); }
+        }
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.05); opacity: 0.8; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .animated-item {
+            opacity: 0;
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+            transform: translateY(30px);
+            will-change: transform, opacity;
+        }
+        .animated-item.is-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        @media (prefers-reduced-motion: reduce) {
+            .animated-item, * {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+                scroll-behavior: auto !important;
+            }
+        }
+
+        /* --- Preloader --- */
+        #preloader {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: var(--bg-color); z-index: 1000;
+            display: flex; justify-content: center; align-items: center;
+            transition: opacity 0.7s ease, visibility 0.7s ease;
+        }
+        #preloader.fade-out { opacity: 0; visibility: hidden; }
+        .loader-text { font-family: 'Playfair Display', serif; font-size: 2rem; color: var(--accent-pink); }
+
+        /* --- Header & Navigation --- */
+        .header {
+            background-color: rgba(255, 245, 247, 0.8);
+            backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+            position: sticky; top: 0; z-index: 50;
+            border-bottom: 1px solid var(--scroll-bar-bg);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+        }
+        #scroll-progress {
+            position: fixed; top: 0; left: 0; height: 3px;
+            background: var(--scroll-bar-color); width: 0%; z-index: 100;
+            transition: width 0.1s linear;
+        }
+        .nav-link { transition: transform 0.3s ease, color 0.3s ease; }
+        .nav-link:hover { transform: translateY(-2px); color: var(--accent-pink); }
+        .active-nav {
+            color: var(--accent-pink); font-weight: 600;
+            position: relative; text-shadow: 0 0 8px rgba(230, 164, 180, 0.7);
+        }
+        .active-nav::after {
+            content: ''; position: absolute; bottom: -6px; left: 0; width: 100%; height: 2px;
+            background-color: var(--accent-pink); animation: grow 0.4s ease-out;
+        }
+        
+        /* --- Cards & Sections --- */
+        .portfolio-card, .skill-card {
+            background-color: #FFFFFF; border-radius: 1.5rem; border: 1px solid var(--scroll-bar-bg);
+            box-shadow: 0 10px 20px -5px rgba(230, 164, 180, 0.1);
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.4s ease;
+        }
+        .portfolio-card:hover {
+            transform: translateY(-10px) rotate(1deg);
+            box-shadow: 0 20px 30px -10px rgba(230, 164, 180, 0.2);
+        }
+        
+        /* --- Text & Buttons --- */
+        .text-gradient {
+            background-image: linear-gradient(135deg, var(--accent-pink-dark), var(--accent-pink));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+        .glowing-text { animation: glow 4s ease-in-out infinite; }
+        
+        .btn-primary {
+            display: inline-block;
+            background-color: var(--accent-pink);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px -3px rgba(230, 164, 180, 0.5);
+        }
+        .btn-primary:hover {
+            background-color: var(--accent-pink-dark);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px -3px rgba(200, 142, 167, 0.6);
+        }
+        
+        /* --- Hero Section & Typewriter --- */
+        #typewriter-cursor { animation: glow 1.5s ease-in-out infinite; }
+        .hero-paragraph { opacity: 0; transform: translateY(20px); transition: opacity 0.5s 2.8s, transform 0.5s 2.8s; }
+
+        /* --- Background Shapes --- */
+        .background-shape {
+            position: absolute;
+            background-color: var(--accent-pink);  /* Use accent color */
+            opacity: 0.08;  /* Very subtle */
+            border-radius: 50%;  /* Make them circles */
+            filter: blur(50px);  /* Soft blur effect */
+            z-index: -1;  /* Send them to the back */
+            will-change: transform;  /* For smooth animations if added later */
+        }
+
+        .shape-1 {
+            width: 200px;
+            height: 200px;
+            top: 5%;
+            left: -10%;
+            background-color: var(--accent-pink-dark);
+            animation: float 10s ease-in-out infinite alternate;
+        }
+
+        .shape-2 {
+            width: 150px;
+            height: 150px;
+            top: 30%;
+            right: -5%;
+            background-color: var(--accent-pink);
+            animation: float 12s ease-in-out infinite alternate-reverse;
+        }
+
+        .shape-3 {
+            width: 100px;
+            height: 100px;
+            bottom: 15%;
+            left: 10%;
+            background-color: var(--scroll-bar-bg);
+            animation: float 8s ease-in-out infinite alternate;
+        }
+
+        .shape-4 {
+            width: 250px;
+            height: 250px;
+            bottom: 5%;
+            right: -15%;
+            background-color: var(--accent-pink-dark);
+            opacity: 0.05;
+            animation: float 14s ease-in-out infinite alternate-reverse;
+        }
+
+        .shape-5 {
+            width: 180px;
+            height: 180px;
+            top: 60%;
+            left: -8%;
+            background-color: var(--accent-pink);
+            animation: float 11s ease-in-out infinite alternate;
+        }
+
+        /* For smaller screens, adjust shape sizes and positions */
+        @media (max-width: 768px) {
+            .background-shape {
+                opacity: 0.05;  /* Even more subtle on mobile */
+                filter: blur(30px);
+            }
+            .shape-1 { width: 100px; height: 100px; top: 10%; left: -15%; }
+            .shape-2 { width: 80px; height: 80px; top: 40%; right: -10%; }
+            .shape-3 { width: 70px; height: 70px; bottom: 20%; left: -5%; }
+            .shape-4 { width: 120px; height: 120px; bottom: 10%; right: -10%; }
+            .shape-5 { width: 90px; height: 90px; top: 70%; left: -10%; }
+        }
+        
+    </style>
+</head>
+<body class="antialiased">
+    
+    <div id="preloader"><span class="loader-text glowing-text">PORTFOLIO</span></div>
+    <div id="scroll-progress"></div>
+
+    <header class="header">
+        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <a href="#" class="text-2xl font-heading font-bold text-primary hover:text-[var(--accent-pink)] transition duration-300">Mariam M. Kamal</a>
+            <div class="hidden md:flex space-x-8 text-primary font-medium">
+                <a href="#welcome" class="nav-link nav-item">Welcome</a>
+                <a href="#my-journey" class="nav-link nav-item">My Journey</a>
+                <a href="#portfolios" class="nav-link nav-item">My Portfolios</a>
+                <a href="#contact" class="nav-link nav-item">Contact</a>
+            </div>
+            <a href="https://www.linkedin.com/in/mariam-mohamed-kamal25/" target="_blank" class="btn-primary hidden md:inline-block">LinkedIn</a>
+        </nav>
+    </header>
+
+    <main class="container mx-auto px-6 py-12 md:py-20">
+
+        <section id="welcome" class="text-center mb-24 md:mb-32 pt-10">
+            <div class="max-w-4xl mx-auto skill-card p-6 md:p-10">
+                <!-- Updated image source to "images/roma.jpg" -->
+                <img src="images/roma.jpg" alt="Mariam Mohamed Kamal Profile Picture" class="w-96 h-96 rounded-full mx-auto mb-6 border-4 border-white shadow-lg transition-transform duration-500 hover:scale-110 animated-item">
+                <h1 class="text-5xl md:text-7xl font-heading font-extrabold leading-tight mt-4 text-gradient glowing-text" id="hero-title">
+                    <span id="typewriter"></span><span id="typewriter-cursor">|</span>
+                </h1>
+                <p class="mt-8 text-lg text-primary/80 leading-relaxed max-w-3xl mx-auto hero-paragraph">
+                    Welcome to my comprehensive portfolio! Here, you'll find a collection of my work, experiences, and projects across various domains. Explore my professional journey, academic achievements, and practical internships to get a full picture of my skills and passion.
+                </p>
+                <div class="mt-10"><a href="#portfolios" class="btn-primary text-lg">Explore Portfolios</a></div>
+            </div>
+        </section>
+
+        <section id="my-journey" class="mb-20 md:mb-28 scroll-mt-24 animated-item">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl md:text-5xl font-heading font-bold text-primary">
+                    My Journey &amp; Key Achievements <i class="fas fa-star text-accent-pink-dark ml-4 animate-pulse" style="animation-duration: 2s;"></i>
+                </h2>
+                <p class="mt-5 text-lg text-primary/70 max-w-3xl mx-auto">
+                    From academic rigor to real-world application, my journey has been defined by a passion for information systems, data management, and digital transformation.
+                </p>
+            </div>
+            <div class="skill-card p-6 md:p-10 max-w-5xl mx-auto">
+                <ul class="list-disc list-inside text-primary/70 space-y-3 pl-2 text-lg">
+                    <li>
+                        Driving Digital Transformation with Oracle ERP: Through the Digital Egypt Pioneers Initiative (DEPI), I gained hands-on expertise in Oracle ERP, configuring modules like Inventory, Purchasing, and Order Management. I developed innovative solutions, including an automated demand-supply workflow that reduced human interaction by 90%, and optimized profitability using advanced costing methods.
+                    </li>
+                    <li>
+                        Pioneering Legal Tech Solutions: As part of my college graduation project, I contributed to "Law Tech," a web platform that digitalized legal services. My role in front-end design and user experience planning helped bridge the gap between lawyers and clients, improving efficiency and accessibility in the legal field.
+                    </li>
+                    <li>
+                        Mastering IT Service &amp; Business Intelligence: My MegaSoft IT Training internship provided practical experience in IT Service Management (ITSM) with IBM Maximo and Business Intelligence (BI) using IBM DB2 and Cognos. I gained insights into enterprise-level systems, service workflows, and data analysis, enhancing my ability to extract actionable insights from complex data.
+                    </li>
+                    <li>
+                        Building Robust Database Systems: Through the Oracle DBA Training and Raly IT Internship, I acquired a solid foundation in Oracle Database Administration. My experience includes SQL querying, Linux system administration, backup and recovery with RMAN, and patch management, ensuring data integrity and system stability.
+                    </li>
+                    <li>
+                        Developing Comprehensive Information Systems Knowledge: My academic journey in Information Systems &amp; Electronic Archives equipped me with a strong theoretical and practical understanding of database design, web development (HTML, CSS, JavaScript), archival science, and graphic design.
+                    </li>
+                </ul>
+            </div>
+        </section>
+
+        <section id="portfolios" class="mb-20 md:mb-28 scroll-mt-24 animated-item">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl md:text-5xl font-heading font-bold text-primary">
+                    My Specialized Portfolios <i class="fas fa-folder-open text-accent-pink-dark ml-4 animate-pulse" style="animation-duration: 3s;"></i>
+                </h2>
+                <p class="mt-5 text-lg text-primary/70 max-w-3xl mx-auto">Dive into my specialized portfolios below.</p>
+            </div>
+            <div class="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+                <!-- Professional Portfolio Card -->
+                <a href="depi/depi.html" class="portfolio-card animated-item block text-center p-6">
+                    <div class="text-5xl mb-4 text-accent-pink-dark">
+                        <i class="fas fa-briefcase animate-bounce" style="animation-duration: 4s;"></i>
+                    </div>
+                    <h3 class="text-2xl font-heading font-semibold text-primary mb-2">Professional Portfolio</h3>
+                    <p class="text-primary/70">Showcasing my experience in Digital Egypt Pioneers Initiative (DEPI) and Oracle ERP.</p>
+                    <button class="btn-primary mt-4">View Professional</button>
+                </a>
+
+                <!-- College Portfolio Card -->
+                <a href="college/college.html" class="portfolio-card animated-item block text-center p-6" style="animation-delay: 0.2s;">
+                    <div class="text-5xl mb-4 text-accent-pink-dark">
+                        <i class="fas fa-graduation-cap animate-bounce" style="animation-duration: 4s; animation-delay: 0.2s;"></i>
+                    </div>
+                    <h3 class="text-2xl font-heading font-semibold text-primary mb-2">College Portfolio</h3>
+                    <p class="text-primary/70">Highlighting academic projects and skills from Information Systems &amp; Electronic Archives.</p>
+                    <button class="btn-primary mt-4">View College</button>
+                </a>
+
+                <!-- Internship Portfolio Card -->
+                <a href="internship/internship.html" class="portfolio-card animated-item block text-center p-6" style="animation-delay: 0.4s;">
+                    <div class="text-5xl mb-4 text-accent-pink-dark">
+                        <i class="fas fa-laptop-code animate-bounce" style="animation-duration: 4s; animation-delay: 0.4s;"></i>
+                    </div>
+                    <h3 class="text-2xl font-heading font-semibold text-primary mb-2">Internship Portfolio</h3>
+                    <p class="text-primary/70">Detailing practical experiences from IT and database administration internships.</p>
+                    <button class="btn-primary mt-4">View Internships</button>
+                </a>
+            </div>
+        </section>
+
+        <section id="contact" class="scroll-mt-24 animated-item">
+             <div class="text-center">
+                <h2 class="text-4xl md:text-5xl font-heading font-bold text-primary">Get In Touch</h2>
+                <p class="mt-5 text-lg text-primary/70 max-w-2xl mx-auto">I'm always open to discussing new projects, creative ideas, or opportunities. Feel free to reach out.</p>
+                <div class="mt-8">
+                     <a href="mailto:mariam.kamal.sof@gmail.com" class="btn-primary text-lg">mariam.kamal.sof@gmail.com</a>
+                     <p class="text-primary/60 mt-4">Phone: +20 109 902 4089</p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-primary/5 border-t border-pink-100 mt-20">
+        <div class="container mx-auto px-6 py-8 text-center text-primary/70">
+            <p>© 2024 Mariam Mohamed Kamal. Designed with creativity &amp; passion.</p>
+        </div>
+    </footer>
+
+    <!-- Background Shapes -->
+    <div class="background-shape shape-1"></div>
+    <div class="background-shape shape-2"></div>
+    <div class="background-shape shape-3"></div>
+    <div class="background-shape shape-4"></div>
+    <div class="background-shape shape-5"></div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const preloader = document.getElementById('preloader');
+        window.addEventListener('load', () => { preloader.classList.add('fade-out'); });
+
+        const scrollProgress = document.getElementById('scroll-progress');
+        window.addEventListener('scroll', () => {
+            const scrollPx = document.documentElement.scrollTop;
+            const winHeightPx = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            scrollProgress.style.width = `${(scrollPx / winHeightPx) * 100}%`;
+        });
+
+        const animatedItems = document.querySelectorAll('.animated-item');
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach((entry) => {
+                if (entry.isIntersecting) {
+                    setTimeout(() => { entry.target.classList.add('is-visible'); }, 100);
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.1 });
+        animatedItems.forEach(item => observer.observe(item));
+
+        const sections = document.querySelectorAll('main section');
+        const navLinks = document.querySelectorAll('.nav-item');
+        const navObserver = new IntersectionObserver(entries => {
+            entries.forEach(entry => {
+                if(entry.isIntersecting) {
+                    const id = entry.target.id;
+                    navLinks.forEach(link => {
+                        link.classList.toggle('active-nav', link.getAttribute('href').substring(1) === id);
+                    });
+                }
+            });
+        }, { rootMargin: '-40% 0px -60% 0px' });
+        sections.forEach(section => navObserver.observe(section));
+
+        const typewriterElement = document.getElementById('typewriter');
+        const cursorElement = document.getElementById('typewriter-cursor');
+        const textToType = "Hello, I'm Mariam Mohamed Kamal. Explore My Work.";
+        let i = 0;
+        function typeWriter() {
+            if (i < textToType.length) {
+                if (textToType.substring(i, i+1) === ',') {
+                     typewriterElement.innerHTML += ',<br class="hidden md:inline">';
+                } else { typewriterElement.innerHTML += textToType.charAt(i); }
+                i++;
+                setTimeout(typeWriter, 60);
+            } else {
+                cursorElement.style.animation = 'none';
+                cursorElement.style.opacity = 0;
+                document.querySelector('.hero-paragraph').style.opacity = '1';
+                document.querySelector('.hero-paragraph').style.transform = 'translateY(0)';
+            }
+        }
+        setTimeout(typeWriter, 500);
+    });
+    </script>
+</body>
+</html>

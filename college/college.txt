@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>College Portfolio: Information Systems &amp; Electronic Archives</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #FFF5F7;
+            --text-primary: #4A2731;
+            --accent-pink: #E6A4B4;
+            --accent-pink-dark: #C88EA7;
+            --scroll-bar-color: var(--accent-pink);
+            --scroll-bar-bg: #FADADD;
+        }
+
+        /* --- Global & Accessibility --- */
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            position: relative; /* Added for background shapes */
+        }
+        .font-heading { font-family: 'Playfair Display', serif; }
+
+        /* --- Animations & Transitions --- */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(40px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes glow {
+            0%, 100% { text-shadow: 0 0 2px var(--accent-pink), 0 0 5px var(--accent-pink); } /* Reduced glow */
+            50% { text-shadow: 0 0 10px var(--accent-pink-dark), 0 0 15px var(--accent-pink-dark); } /* Reduced glow */
+        }
+        @keyframes grow { from { width: 0%; } to { width: 100%; } }
+        @keyframes float {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(20px, 30px); }
+        }
+
+        .animated-item {
+            opacity: 0;
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+            transform: translateY(30px);
+            will-change: transform, opacity;
+        }
+        .animated-item.is-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        @media (prefers-reduced-motion: reduce) {
+            .animated-item, * {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+                scroll-behavior: auto !important;
+            }
+        }
+
+        /* --- Preloader --- */
+        #preloader {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: var(--bg-color); z-index: 1000;
+            display: flex; justify-content: center; align-items: center;
+            transition: opacity 0.7s ease, visibility 0.7s ease;
+        }
+        #preloader.fade-out { opacity: 0; visibility: hidden; }
+        .loader-text { font-family: 'Playfair Display', serif; font-size: 2rem; color: var(--accent-pink); }
+
+        /* --- Header & Navigation --- */
+        .header {
+            background-color: rgba(255, 245, 247, 0.8);
+            backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+            position: sticky; top: 0; z-index: 50;
+            border-bottom: 1px solid var(--scroll-bar-bg);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+        }
+        #scroll-progress {
+            position: fixed; top: 0; left: 0; height: 3px;
+            background: var(--scroll-bar-color); width: 0%; z-index: 100;
+            transition: width 0.1s linear;
+        }
+        .nav-link { transition: transform 0.3s ease, color 0.3s ease; }
+        .nav-link:hover { transform: translateY(-2px); color: var(--accent-pink); }
+        .active-nav {
+            color: var(--accent-pink); font-weight: 600;
+            position: relative; text-shadow: 0 0 8px rgba(230, 164, 180, 0.7);
+        }
+        .active-nav::after {
+            content: ''; position: absolute; bottom: -6px; left: 0; width: 100%; height: 2px;
+            background-color: var(--accent-pink); animation: grow 0.4s ease-out;
+        }
+        
+        /* --- Cards & Sections --- */
+        .project-card, .skill-card {
+            background-color: #FFFFFF; border-radius: 1.5rem; border: 1px solid var(--scroll-bar-bg);
+            box-shadow: 0 10px 20px -5px rgba(230, 164, 180, 0.1);
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.4s ease;
+        }
+        .project-card:hover {
+            transform: translateY(-10px) rotate(1deg);
+            box-shadow: 0 20px 30px -10px rgba(230, 164, 180, 0.2);
+        }
+        
+        /* --- Text & Buttons --- */
+        .text-gradient {
+            background-image: linear-gradient(135deg, var(--accent-pink-dark), var(--accent-pink));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+        .glowing-text { animation: glow 4s ease-in-out infinite; }
+        
+        .btn-primary {
+            display: inline-block;
+            background-color: var(--accent-pink);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px -3px rgba(230, 164, 180, 0.5);
+        }
+        .btn-primary:hover {
+            background-color: var(--accent-pink-dark);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px -3px rgba(200, 142, 167, 0.6);
+        }
+        
+        /* --- Hero Section & Typewriter --- */
+        #typewriter-cursor { animation: glow 1.5s ease-in-out infinite; }
+        .hero-paragraph { opacity: 0; transform: translateY(20px); transition: opacity 0.5s 2.8s, transform 0.5s 2.8s; }
+
+        /* --- Expandable Content (Accordion) --- */
+        .expand-button {
+            width: 100%;
+            padding: 1.5rem;
+            border-radius: 1.25rem;
+            background-color: white;
+            border: 1px solid var(--scroll-bar-bg);
+            box-shadow: 0 5px 15px -3px rgba(230, 164, 180, 0.08);
+            transition: all 0.3s ease;
+        }
+        .expand-button:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px -5px rgba(230, 164, 180, 0.2);
+            border-color: var(--accent-pink);
+        }
+        .expandable-content {
+            padding: 0 1.5rem;
+            max-height: 0;
+            overflow: hidden;
+            background-color: white;
+            border-radius: 0 0 1.25rem 1.25rem;
+            border: 1px solid var(--scroll-bar-bg);
+            border-top: none;
+            box-shadow: 0 10px 15px -5px rgba(230, 164, 180, 0.1) inset;
+            will-change: max-height;
+            transition: max-height 1s cubic-bezier(0.4, 0, 0.2, 1), padding 0.5s ease;
+        }
+        .expandable-content.expanded {
+            max-height: 2500px; /* Generous height for all content */
+            padding-top: 1rem;
+            padding-bottom: 2rem;
+        }
+        .chevron { transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .expanded .chevron { transform: rotate(180deg); }
+
+        /* --- Background Shapes --- */
+        .background-shape {
+            position: absolute;
+            background-color: var(--accent-pink); /* Use accent color */
+            opacity: 0.08; /* Very subtle */
+            border-radius: 50%; /* Make them circles */
+            filter: blur(50px); /* Soft blur effect */
+            z-index: -1; /* Send them to the back */
+            will-change: transform; /* For smooth animations if added later */
+        }
+
+        .shape-1 {
+            width: 200px;
+            height: 200px;
+            top: 5%;
+            left: -10%;
+            background-color: var(--accent-pink-dark);
+            animation: float 10s ease-in-out infinite alternate;
+        }
+
+        .shape-2 {
+            width: 150px;
+            height: 150px;
+            top: 30%;
+            right: -5%;
+            background-color: var(--accent-pink);
+            animation: float 12s ease-in-out infinite alternate-reverse;
+        }
+
+        .shape-3 {
+            width: 100px;
+            height: 100px;
+            bottom: 15%;
+            left: 10%;
+            background-color: var(--scroll-bar-bg);
+            animation: float 8s ease-in-out infinite alternate;
+        }
+
+        .shape-4 {
+            width: 250px;
+            height: 250px;
+            bottom: 5%;
+            right: -15%;
+            background-color: var(--accent-pink-dark);
+            opacity: 0.05;
+            animation: float 14s ease-in-out infinite alternate-reverse;
+        }
+
+        .shape-5 {
+            width: 180px;
+            height: 180px;
+            top: 60%;
+            left: -8%;
+            background-color: var(--accent-pink);
+            animation: float 11s ease-in-out infinite alternate;
+        }
+
+        /* For smaller screens, adjust shape sizes and positions */
+        @media (max-width: 768px) {
+            .background-shape {
+                opacity: 0.05; /* Even more subtle on mobile */
+                filter: blur(30px);
+            }
+            .shape-1 { width: 100px; height: 100px; top: 10%; left: -15%; }
+            .shape-2 { width: 80px; height: 80px; top: 40%; right: -10%; }
+            .shape-3 { width: 70px; height: 70px; bottom: 20%; left: -5%; }
+            .shape-4 { width: 120px; height: 120px; bottom: 10%; right: -10%; }
+            .shape-5 { width: 90px; height: 90px; top: 70%; left: -10%; }
+        }
+        
+    </style>
+</head>
+<body class="antialiased">
+    
+    <div id="preloader"><span class="loader-text glowing-text">COLLEGE</span></div>
+    <div id="scroll-progress"></div>
+
+    <header class="header">
+        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <a href="#" class="text-2xl font-heading font-bold text-primary hover:text-[var(--accent-pink)] transition duration-300">My College Portfolio</a>
+            <div class="hidden md:flex space-x-8 text-primary font-medium">
+                <a href="#introduction" class="nav-link nav-item">Introduction</a>
+                <a href="#projects-section" class="nav-link nav-item">Projects</a>
+                <a href="#skills-gained" class="nav-link nav-item">Skills</a>
+                <a href="#courses-section" class="nav-link nav-item">Courses</a>
+                <a href="#contact" class="nav-link nav-item">Contact</a>
+            </div>
+            <a href="https://www.linkedin.com/in/mariam-mohamed-kamal25/" target="_blank" class="btn-primary hidden md:inline-block">LinkedIn</a>
+        </nav>
+    </header>
+
+    <main class="container mx-auto px-6 py-12 md:py-20">
+
+        <section id="introduction" class="text-center mb-24 md:mb-32 pt-10">
+            <div class="max-w-4xl mx-auto skill-card p-6 md:p-10">
+                <img src="https://placehold.co/150x150/E6A4B4/4A2731?text=🎓" alt="University Icon" class="w-64 h-64 rounded-full mx-auto mb-6 border-4 border-white shadow-lg transition-transform duration-500 hover:scale-110 animated-item">
+                <h1 class="text-5xl md:text-7xl font-heading font-extrabold leading-tight mt-4 text-gradient glowing-text" id="hero-title">
+                    <span id="typewriter"></span><span id="typewriter-cursor">|</span>
+                </h1>
+                <p class="mt-8 text-lg text-primary/80 leading-relaxed max-w-3xl mx-auto hero-paragraph">
+                    I am a student in the Information Systems &amp; Electronic Archives credit-hour program at Beni Suef University. This is a special program offered by the Faculty of Arts, in collaboration with the Faculty of Computers &amp; Information. It combines theoretical knowledge in archiving with technical skills in IT &amp; digital systems.
+                    <br><br>
+                    Through this program, I was introduced to various computer science subjects that I hadn&apos;t explored before. This exposure helped me discover new interests, especially in areas like databases &amp; information systems, &amp; inspired me to develop real passion &amp; skills in the tech field.
+                </p>
+                <div class="mt-10"><a href="#projects-section" class="btn-primary text-lg">Explore My Projects</a></div>
+            </div>
+        </section>
+
+        <section id="projects-section" class="mb-20 md:mb-28 scroll-mt-24 animated-item">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl md:text-5xl font-heading font-bold text-primary">My Projects</h2>
+                <p class="mt-5 text-lg text-primary/70 max-w-3xl mx-auto">Showcasing my practical application of knowledge through diverse projects.</p>
+            </div>
+            <div class="space-y-4 max-w-5xl mx-auto">
+                <div class="p-4 grid md:grid-cols-1 gap-8">
+                    <!-- Project 3: Law Tech -->
+                    <div class="project-card animated-item">
+                        <div class="p-6">
+                            <h3 class="text-2xl font-heading font-semibold text-primary mb-3">Law Tech – Legal Services Web Platform (Graduation Project)</h3>
+                            <p class="text-primary/70 mb-4"><strong>The Challenge:</strong> Most lawyers face difficulties managing their work digitally. They still rely on traditional methods to organize documents, schedule appointments, &amp; communicate with clients, which causes confusion, missed deadlines, &amp; a lack of efficiency. At the same time, many clients don&apos;t know how to find the right lawyer or communicate safely &amp; directly. We wanted to solve both problems with one unified online platform.</p>
+                            <p class="text-primary/70 mb-4"><strong>The Project:</strong> We created Law Tech, a responsive web platform designed for both lawyers &amp; clients. Key features included:</p>
+                            <ul class="list-disc list-inside text-primary/70 space-y-1 mb-4 pl-2 text-sm">
+                                <li><strong>For Clients:</strong> Easy account creation, Search &amp; browse lawyer profiles, Request to contact specific lawyers</li>
+                                <li><strong>For Lawyers:</strong> Dashboard to manage files &amp; cases, Interactive court map to find nearby courts, Customizable legal templates (petitions, contracts, etc.), Document center to upload, organize, &amp; view legal files, A library of categorized legal books &amp; references, Live chat with clients for direct communication, Smart calendar with reminders for meetings &amp; court dates</li>
+                            </ul>
+                            <p class="text-primary/70 mb-4"><strong>Impact:</strong> The platform helped bridge the gap between lawyers &amp; clients, &amp; introduced digital solutions to common problems in the legal field. It improved organization, communication, &amp; accessibility to legal services. The project also gave us hands-on experience in team-based development, user experience thinking, &amp; solving real-world issues.</p>
+                            <p class="text-primary/70"><strong>Team:</strong> A team of 7 members worked on this project. My role focused on front-end design &amp; layout structure planning. I also contributed to user journey design, page structuring, &amp; content organization.</p>
+                        </div>
+                        <img src="https://placehold.co/600x350/F8E8EE/4A2731?text=Law+Tech+Platform" alt="Law Tech Project Image" class="rounded-b-2xl w-full"/>
+                    </div>
+
+                    <!-- Project 2: Turkey Tourism Website -->
+                    <div class="project-card animated-item">
+                        <div class="p-6">
+                            <h3 class="text-2xl font-heading font-semibold text-primary mb-3">Turkey Tourism Website (Travel In)</h3>
+                            <p class="text-primary/70 mb-4"><strong>The Challenge:</strong> Many travelers struggle to find reliable, organized information about tourist destinations, accommodations, &amp; activities in Turkey. The challenge was to build a simple, trustworthy website that gathers all essential travel details in one place to make trip planning easier.</p>
+                            <p class="text-primary/70 mb-4"><strong>The Project:</strong> I designed &amp; developed a tourism website using HTML &amp; CSS, featuring:</p>
+                            <ul class="list-disc list-inside text-primary/70 space-y-1 mb-4 pl-2 text-sm">
+                                <li>5 major tourist destinations in Turkey</li>
+                                <li>Information about the best hotels, restaurants, &amp; activities</li>
+                                <li>Direct booking links under each section</li>
+                                <li>Highlights of famous Turkish dishes &amp; local cultural tips</li>
+                            </ul>
+                            <p class="text-primary/70 mb-4"><strong>Impact:</strong> The website served as a practical travel guide, helping users explore options &amp; plan their trip more efficiently through trusted resources &amp; organized content.</p>
+                            <p class="text-primary/70"><strong>Team:</strong> Individual project</p>
+                        </div>
+                        <img src="https://placehold.co/600x350/F8E8EE/4A2731?text=Turkey+Tourism+Website" alt="Turkey Tourism Website Image" class="rounded-b-2xl w-full"/>
+                    </div>
+
+                    <!-- Project 1: Hospital Database Management System -->
+                    <div class="project-card animated-item">
+                        <div class="p-6">
+                            <h3 class="text-2xl font-heading font-semibold text-primary mb-3">Hospital Database Management System</h3>
+                            <p class="text-primary/70 mb-4"><strong>The Challenge:</strong> The hospital lacked a digital system for managing patient &amp; room assignment data, which led to confusion in room availability, patient placement, &amp; inefficient tracking of hospital resources.</p>
+                            <p class="text-primary/70 mb-4"><strong>The Project:</strong> We designed a complete database system using Microsoft Access, which included:</p>
+                            <ul class="list-disc list-inside text-primary/70 space-y-1 mb-4 pl-2 text-sm">
+                                <li>Relational tables (Patients, Doctors, Rooms, etc.)</li>
+                                <li>Queries to filter &amp; retrieve accurate data (e.g., available rooms, assigned rooms)</li>
+                                <li>User-friendly forms for data entry</li>
+                                <li>Auto-generated reports for room usage &amp; patient distribution</li>
+                            </ul>
+                            <p class="text-primary/70 mb-4"><strong>Impact:</strong> The system helped organize room management efficiently, ensured better resource allocation, &amp; improved data accessibility.</p>
+                            <p class="text-primary/70"><strong>Team:</strong> Me &amp; Hagar – We collaborated on database structure, relationships, queries, forms, &amp; reports.</p>
+                        </div>
+                        <img src="https://placehold.co/600x350/F8E8EE/4A2731?text=Hospital+Database" alt="Hospital Database System Image" class="rounded-b-2xl w-full"/>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="skills-gained" class="mb-20 md:mb-28 scroll-mt-24">
+            <div class="text-center animated-item mb-16">
+                <h2 class="text-4xl md:text-5xl font-heading font-bold text-primary">Key Skills Gained</h2>
+                <p class="mt-5 text-lg text-primary/70 max-w-3xl mx-auto">A comprehensive overview of the practical skills I've cultivated throughout my studies.</p>
+            </div>
+            <div class="skill-card p-6 md:p-10 max-w-5xl mx-auto mb-8">
+                <ul class="list-disc list-inside text-primary/70 space-y-2 pl-2">
+                    <li><strong>Information Systems Design &amp; Management:</strong> Expertise in designing, implementing, &amp; managing robust information systems.</li>
+                    <li><strong>Database Management:</strong> Proficient in relational database design, querying (SQL), data entry forms, &amp; report generation (e.g., Microsoft Access).</li>
+                    <li><strong>Web Development:</strong> Solid foundation in front-end development using HTML, CSS, &amp; JavaScript, with an understanding of web programming principles.</li>
+                    <li><strong>Archival Science &amp; Digital Preservation:</strong> Comprehensive knowledge of archival concepts, digital preservation strategies, metadata standards, &amp; electronic document management.</li>
+                    <li><strong>Document Management:</strong> Skilled in classification, indexing, lifecycle management, &amp; digital conversion of various document types.</li>
+                    <li><strong>Networking Fundamentals &amp; Security:</strong> Understanding of computer networks, protocols, &amp; principles of information security &amp; protection.</li>
+                    <li><strong>Operating Systems Concepts:</strong> Knowledge of OS principles, process management, memory, file systems, &amp; advanced topics like virtualization.</li>
+                    <li><strong>Programming Logic &amp; C++:</strong> Strong grasp of programming logic, control structures, data structures, &amp; problem-solving using C++.</li>
+                    <li><strong>Research &amp; Data Analysis:</strong> Competence in research methodologies, data collection, analysis, &amp; research data management.</li>
+                    <li><strong>Digital Marketing:</strong> Awareness of digital marketing tools &amp; strategies for promoting information services &amp; digital collections.</li>
+                    <li><strong>Cloud Computing:</strong> Familiarity with cloud infrastructure applications for archival data storage &amp; protection.</li>
+                    <li><strong>Artificial Intelligence in Information Systems:</strong> Introduction to AI applications for improving information services.</li>
+                    <li><strong>Project Management &amp; Team Collaboration:</strong> Practical experience in team-based project development &amp; user experience (UX) thinking.</li>
+                </ul>
+            </div>
+        </section>
+
+        <section id="courses-section" class="mb-20 md:mb-28 scroll-mt-24">
+            <div class="text-center animated-item mb-16">
+                <h2 class="text-4xl md:text-5xl font-heading font-bold text-primary">Detailed Coursework</h2>
+                <p class="mt-5 text-lg text-primary/70 max-w-3xl mx-auto">A deep dive into the academic courses that shaped my knowledge base.</p>
+            </div>
+            <div class="space-y-4 max-w-5xl mx-auto">
+                <!-- Archival Science & Document Management -->
+                <div class="animated-item">
+                    <button class="expand-button flex justify-between items-center text-left">
+                        <div>
+                            <h3 class="text-xl md:text-2xl font-heading font-bold text-primary"><span class="text-4xl mr-2">🗂</span> Archival Science &amp; Document Management</h3>
+                            <p class="text-primary/70 mt-1">Foundational &amp; advanced concepts for managing information assets.</p>
+                        </div><span class="chevron text-3xl text-gradient">▼</span>
+                    </button>
+                    <div class="expandable-content"><div class="p-4">
+                        <ul class="list-disc list-inside text-primary/70 space-y-2 text-sm pl-2">
+                            <li><strong>Introduction to Archival Science:</strong> Overview of archival concepts, history, &amp; practices in managing historical records &amp; institutional memory.</li>
+                            <li><strong>Administrative Documents:</strong> Focuses on the creation, organization, &amp; lifecycle management of documents in administrative settings.</li>
+                            <li><strong>Classification &amp; Indexing of Documents:</strong> Teaches methods of categorizing &amp; indexing documents for efficient retrieval &amp; management.</li>
+                            <li><strong>Electronic Document Management:</strong> Focuses on the systems &amp; tools used for managing digital documents in organizations.</li>
+                            <li><strong>Document Metadata:</strong> Study of metadata standards &amp; their role in organizing, retrieving, &amp; preserving digital documents.</li>
+                            <li><strong>Specialized &amp; Thematic Archives:</strong> Examines archives serving specific domains (medical, legal, audiovisual) &amp; their unique practices.</li>
+                            <li><strong>Institutional Digital Repositories:</strong> Covers the design &amp; management of digital repositories in organizations.</li>
+                            <li><strong>Digital Document Access Systems:</strong> Tools &amp; methods for making digital records accessible, searchable, &amp; usable online.</li>
+                            <li><strong>Digital Conversion of Documents:</strong> Techniques &amp; tools for digitizing paper documents &amp; managing born-digital records.</li>
+                            <li><strong>Appraisal &amp; Disposal of Electronic Documents:</strong> Criteria &amp; procedures for evaluating &amp; removing obsolete or unnecessary digital records.</li>
+                            <li><strong>Electronic Archiving of Medical Records:</strong> Management of digital medical records in compliance with legal &amp; healthcare standards.</li>
+                            <li><strong>Preservation &amp; Conservation of Documents:</strong> Protect documents from damage &amp; ensure their long-term survival. It covers both preventive care (like proper storage &amp; handling) &amp; repair techniques for damaged materials.</li>
+                            <li><strong>International Standards for Document Management:</strong> Overview of global standards (e.g., ISO 15489) used in organizing &amp; controlling document systems.</li>
+                            <li><strong>Medical Records Management &amp; Electronic Archiving:</strong> Covers both the practical &amp; regulatory aspects of managing electronic medical records.</li>
+                            <li><strong>Digital Information Services in Archives:</strong> Delivery of reference, research, &amp; user support services via digital platforms in archival settings.</li>
+                            <li><strong>Cloud Computing in Archives:</strong> Use of cloud infrastructure to store, access, &amp; protect archival data.</li>
+                        </ul>
+                    </div></div>
+                </div>
+
+                <!-- Information Systems & Technology -->
+                <div class="animated-item">
+                    <button class="expand-button flex justify-between items-center text-left">
+                        <div>
+                            <h3 class="text-xl md:text-2xl font-heading font-bold text-primary"><span class="text-4xl mr-2">💻</span> Information Systems &amp; Technology</h3>
+                            <p class="text-primary/70 mt-1">Understanding the core components &amp; infrastructure of digital environments.</p>
+                        </div><span class="chevron text-3xl text-gradient">▼</span>
+                    </button>
+                    <div class="expandable-content"><div class="p-4">
+                        <ul class="list-disc list-inside text-primary/70 space-y-2 text-sm pl-2">
+                            <li><strong>Introduction to Information Systems:</strong> Covers the fundamentals of information systems, their components, &amp; how they support decision-making in organizations.</li>
+                            <li><strong>Operating Systems:</strong> Study of operating system concepts such as process management, memory, binary system, file systems, &amp; security.</li>
+                            <li><strong>Operating Systems II:</strong> Advanced topics in OS design, such as virtualization, distributed systems, &amp; real-time systems.</li>
+                            <li><strong>Internet Technologies:</strong> Introduces internet architecture, web protocols, &amp; emerging technologies shaping online communication.</li>
+                            <li><strong>Computer Networks I:</strong> Basic networking principles, including protocols, topologies, &amp; network hardware.</li>
+                            <li><strong>Computer Networks II:</strong> Advanced networking concepts including routing, network security, &amp; wireless technologies.</li>
+                            <li><strong>Internet of Things in Information Institutions:</strong> Application of IoT technologies in libraries, archives, &amp; other knowledge centers.</li>
+                            <li><strong>Information Security &amp; Protection:</strong> Principles &amp; practices of safeguarding data from unauthorized access, loss, or corruption.</li>
+                            <li><strong>Information Retrieval Systems:</strong> Study of systems that help users locate relevant information from large data collections.</li>
+                            <li><strong>Software &amp; Information System Quality Assurance:</strong> Ensures the reliability, performance, &amp; compliance of software systems &amp; IT services.</li>
+                        </ul>
+                    </div></div>
+                </div>
+
+                <!-- Programming & Web Development -->
+                <div class="animated-item">
+                    <button class="expand-button flex justify-between items-center text-left">
+                        <div>
+                            <h3 class="text-xl md:text-2xl font-heading font-bold text-primary"><span class="text-4xl mr-2">👨‍💻</span> Programming &amp; Web Development</h3>
+                            <p class="text-primary/70 mt-1">Building digital solutions from logic to user interface.</p>
+                        </div><span class="chevron text-3xl text-gradient">▼</span>
+                    </button>
+                    <div class="expandable-content"><div class="p-4">
+                        <ul class="list-disc list-inside text-primary/70 space-y-2 text-sm pl-2">
+                            <li><strong>Concepts of Programming Languages:</strong> Introduction to the principles, syntax, &amp; structure of modern programming languages.</li>
+                            <li><strong>Computer Programming (1):</strong> Introduction to programming logic, control structures, &amp; basic coding using a selected language (C++).</li>
+                            <li><strong>Computer Programming (2):</strong> Continuation of Programming (1) with more complex algorithms, data structures, &amp; problem-solving.</li>
+                            <li><strong>Web Programming:</strong> Development of dynamic websites using HTML, CSS, JavaScript.</li>
+                        </ul>
+                    </div></div>
+                </div>
+
+                <!-- Research & Analytical Skills -->
+                <div class="animated-item">
+                    <button class="expand-button flex justify-between items-center text-left">
+                        <div>
+                            <h3 class="text-xl md:text-2xl font-heading font-bold text-primary"><span class="text-4xl mr-2">🔬</span> Research &amp; Analytical Skills</h3>
+                            <p class="text-primary/70 mt-1">Developing a systematic approach to problem-solving &amp; data handling.</p>
+                        </div><span class="chevron text-3xl text-gradient">▼</span>
+                    </button>
+                    <div class="expandable-content"><div class="p-4">
+                        <ul class="list-disc list-inside text-primary/70 space-y-2 text-sm pl-2">
+                            <li><strong>Research Methods:</strong> Introduces methodologies &amp; tools used in academic &amp; applied research, with a focus on data collection &amp; analysis.</li>
+                            <li><strong>Research Data Management:</strong> Strategies &amp; tools for organizing, storing, sharing, &amp; preserving research-generated data.</li>
+                        </ul>
+                    </div></div>
+                </div>
+
+                <!-- Ethics & Legislation -->
+                <div class="animated-item">
+                    <button class="expand-button flex justify-between items-center text-left">
+                        <div>
+                            <h3 class="text-xl md:text-2xl font-heading font-bold text-primary"><span class="text-4xl mr-2">⚖️</span> Ethics &amp; Legislation</h3>
+                            <p class="text-primary/70 mt-1">Navigating the legal &amp; ethical landscape of information.</p>
+                        </div><span class="chevron text-3xl text-gradient">▼</span>
+                    </button>
+                    <div class="expandable-content"><div class="p-4">
+                        <ul class="list-disc list-inside text-primary/70 space-y-2 text-sm pl-2">
+                            <li><strong>Human Rights:</strong> Overview of the evolution, principles, &amp; global applications of human rights.</li>
+                            <li><strong>Information Ethics:</strong> Discusses ethical issues in the digital age such as data privacy, intellectual property, &amp; information bias.</li>
+                            <li><strong>Information Legislation:</strong> Study of national &amp; international laws governing data access, privacy, &amp; digital rights.</li>
+                        </ul>
+                    </div></div>
+                </div>
+
+                <!-- Communication & Digital Strategy -->
+                <div class="animated-item">
+                    <button class="expand-button flex justify-between items-center text-left">
+                        <div>
+                            <h3 class="text-xl md:text-2xl font-heading font-bold text-primary"><span class="text-4xl mr-2">🗣️</span> Communication &amp; Digital Strategy</h3>
+                            <p class="text-primary/70 mt-1">Mastering effective communication &amp; strategic digital outreach.</p>
+                        </div><span class="chevron text-3xl text-gradient">▼</span>
+                    </button>
+                    <div class="expandable-content"><div class="p-4">
+                        <ul class="list-disc list-inside text-primary/70 space-y-2 text-sm pl-2">
+                            <li><strong>Communication Science:</strong> Explores communication theories, models, &amp; media in both individual &amp; organizational contexts.</li>
+                            <li><strong>Digital Marketing for Documents:</strong> Explores how libraries, archives, &amp; information centers can use digital marketing tools to promote their services &amp; digital collections.</li>
+                            <li><strong>Artificial Intelligence in Information Institutions:</strong> Introduction to how AI can improve services in libraries, archives, &amp; research centers.</li>
+                        </ul>
+                    </div></div>
+                </div>
+            </div>
+        </section>
+
+        <section id="contact" class="scroll-mt-24 animated-item">
+             <div class="text-center">
+                <h2 class="text-4xl md:text-5xl font-heading font-bold text-primary">Get In Touch</h2>
+                <p class="mt-5 text-lg text-primary/70 max-w-2xl mx-auto">I'm always open to discussing new projects, creative ideas, or opportunities. Feel free to reach out.</p>
+                <div class="mt-8">
+                     <a href="mailto:mariam.kamal.sof@gmail.com" class="btn-primary text-lg">mariam.kamal.sof@gmail.com</a>
+                     <p class="text-primary/60 mt-4">Phone: +20 109 902 4089</p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-primary/5 border-t border-pink-100 mt-20">
+        <div class="container mx-auto px-6 py-8 text-center text-primary/70">
+            <p>© 2024 My College Portfolio. Designed with creativity &amp; passion.</p>
+        </div>
+    </footer>
+
+    <!-- Background Shapes -->
+    <div class="background-shape shape-1"></div>
+    <div class="background-shape shape-2"></div>
+    <div class="background-shape shape-3"></div>
+    <div class="background-shape shape-4"></div>
+    <div class="background-shape shape-5"></div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const preloader = document.getElementById('preloader');
+        window.addEventListener('load', () => { preloader.classList.add('fade-out'); });
+
+        const scrollProgress = document.getElementById('scroll-progress');
+        window.addEventListener('scroll', () => {
+            const scrollPx = document.documentElement.scrollTop;
+            const winHeightPx = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            scrollProgress.style.width = `${(scrollPx / winHeightPx) * 100}%`;
+        });
+
+        const animatedItems = document.querySelectorAll('.animated-item');
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach((entry) => {
+                if (entry.isIntersecting) {
+                    setTimeout(() => { entry.target.classList.add('is-visible'); }, 100);
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.1 });
+        animatedItems.forEach(item => observer.observe(item));
+
+        const sections = document.querySelectorAll('main section');
+        const navLinks = document.querySelectorAll('.nav-item');
+        const navObserver = new IntersectionObserver(entries => {
+            entries.forEach(entry => {
+                if(entry.isIntersecting) {
+                    const id = entry.target.id;
+                    navLinks.forEach(link => {
+                        link.classList.toggle('active-nav', link.getAttribute('href').substring(1) === id);
+                    });
+                }
+            });
+        }, { rootMargin: '-40% 0px -60% 0px' });
+        sections.forEach(section => navObserver.observe(section));
+
+        const typewriterElement = document.getElementById('typewriter');
+        const cursorElement = document.getElementById('typewriter-cursor');
+        // Updated typewriter text for college portfolio
+        const textToType = "Exploring Information Systems &amp; Digital Archiving.";
+        let i = 0;
+        function typeWriter() {
+            if (i < textToType.length) {
+                if (textToType.substring(i, i+1) === ',') {
+                     typewriterElement.innerHTML += ',<br class="hidden md:inline">';
+                } else { typewriterElement.innerHTML += textToType.charAt(i); }
+                i++;
+                setTimeout(typeWriter, 60);
+            } else {
+                cursorElement.style.animation = 'none';
+                cursorElement.style.opacity = 0;
+                document.querySelector('.hero-paragraph').style.opacity = '1';
+                document.querySelector('.hero-paragraph').style.transform = 'translateY(0)';
+            }
+        }
+        setTimeout(typeWriter, 500);
+
+        document.querySelectorAll('.expand-button').forEach(button => {
+            button.addEventListener('click', () => {
+                const content = button.nextElementSibling;
+                button.classList.toggle('expanded');
+                content.classList.toggle('expanded');
+            });
+        });
+    });
+    </script>
+</body>
+</html>
